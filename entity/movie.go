@@ -12,6 +12,17 @@ type Movie struct {
 	UpdatedAt   *time.Time
 }
 
+type MovieWithFilePath struct {
+	Movie
+	FilePath string `gorm:"column:file_path" json:"file_path" binding:"required"`
+}
+
+type MovieDetail struct {
+	MovieWithFilePath
+	Genres []MoviesGenreSelect `json:"genres"`
+	Actors []MoviesActorSelect `json:"artists"`
+}
+
 func (Movie) TableName() string {
 	return "movie"
 }

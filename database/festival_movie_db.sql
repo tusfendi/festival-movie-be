@@ -104,6 +104,7 @@ CREATE TABLE `user_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `movie_id` int(11) NOT NULL,
+  `genre_id` int(11) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

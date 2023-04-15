@@ -6,20 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/tusfendi/festival-movie-be/entity"
 )
 
-func TokenValid(key string, c *gin.Context) error {
+func TokenValid(key string, c *gin.Context) (claims *entity.SSJWTClaim, err error) {
 	tokenString := ExtractToken(c)
-	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(key), nil
 	})
 	if err != nil {
-		return err
+		return claims, err
 	}
-	return nil
+	return claims, nil
 }
 
 func ExtractToken(c *gin.Context) string {
