@@ -9,6 +9,8 @@ import (
 	"github.com/subosito/gotenv"
 	"github.com/tusfendi/festival-movie-be/cmd/api/middleware"
 	"github.com/tusfendi/festival-movie-be/config"
+	"github.com/tusfendi/festival-movie-be/repository"
+	"github.com/tusfendi/festival-movie-be/usecase"
 )
 
 func init() {
@@ -17,7 +19,7 @@ func init() {
 
 func main() {
 	cfg := config.NewConfig()
-	_, err := config.NewMysql(cfg.AppEnv, &cfg.MysqlOption)
+	mysqlConn, err := config.NewMysql(cfg.AppEnv, &cfg.MysqlOption)
 	if err != nil {
 		log.Fatal(err)
 		println("error mysql")
@@ -31,6 +33,20 @@ func main() {
 		fmt.Println("The URL: ", c.Request.Host+c.Request.URL.Path)
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{"response": c.Request.Host})
 	})
+
+	// repository
+	actorRepository := repository.NewActorRepository(mysqlConn)
+
+	// usecase
+	actorUsecase := usecase.NewActorUsecase(actorRepository)
+
+	// Handler
+	// actor
+	r.GET("/artists", actorUsecase.Get)
+	r.POST("/artists", actorUsecase.CreateActor)
+	r.GET("/artists/:id", actorUsecase.GetDetail)
+	r.PATCH("/artists/:id", actorUsecase.UpdateActor)
+	r.DELETE("/artists/:id", actorUsecase.DeleteActor)
 
 	r.Run(":" + fmt.Sprint(cfg.ApiPort))
 }

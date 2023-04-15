@@ -15,6 +15,9 @@ func JwtAuthMiddleware(key string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		// TBU
+		c.Set("user_id", 1)
+		c.Set("level", "ADMIN")
 
 		c.Next()
 	}
