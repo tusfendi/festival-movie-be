@@ -36,9 +36,11 @@ func main() {
 
 	// repository
 	actorRepository := repository.NewActorRepository(mysqlConn)
+	genreRepository := repository.NewGenreRepository(mysqlConn)
 
 	// usecase
 	actorUsecase := usecase.NewActorUsecase(actorRepository)
+	genreUsecase := usecase.NewGenreUsecase(genreRepository)
 
 	// Handler
 	// actor
@@ -47,6 +49,13 @@ func main() {
 	r.GET("/artists/:id", actorUsecase.GetDetail)
 	r.PATCH("/artists/:id", actorUsecase.UpdateActor)
 	r.DELETE("/artists/:id", actorUsecase.DeleteActor)
+
+	// genre
+	r.GET("/genres", genreUsecase.Get)
+	r.POST("/genres", genreUsecase.CreateGenre)
+	r.GET("/genres/:id", genreUsecase.GetDetail)
+	r.PATCH("/genres/:id", genreUsecase.UpdateGenre)
+	r.DELETE("/genres/:id", genreUsecase.DeleteGenre)
 
 	r.Run(":" + fmt.Sprint(cfg.ApiPort))
 }
