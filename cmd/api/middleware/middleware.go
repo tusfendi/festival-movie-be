@@ -5,19 +5,30 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tusfendi/festival-movie-be/config"
+	"github.com/tusfendi/festival-movie-be/repository"
 )
 
-func JwtAuthMiddleware(key string) gin.HandlerFunc {
+const ADMIN = "admin"
+
+func JwtAuthMiddleware(key string, userRepo repository.UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := config.TokenValid(key, c)
+		claims, err := config.TokenValid(key, c)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"response": "gagal", "error": "Anda tidak ada Akses", "error_detail": err.Error()})
 			c.Abort()
 			return
 		}
-		// TBU
-		c.Set("user_id", 1)
-		c.Set("level", "ADMIN")
+
+		user, err := userRepo.GetUserByJTI(claims.Id)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"response": "gagal", "error": "Terjadi kesalahan", "error_detail": err.Error()})
+			c.Abort()
+			return
+		}
+
+		c.Set("user_id", claims.UserID)
+		c.Set("jti", claims.Id)
+		c.Set("user_level", user.Level)
 
 		c.Next()
 	}
